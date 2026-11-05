@@ -1,0 +1,30 @@
+# *******************************************************************************
+# Copyright (c) 2026 Contributors to the Eclipse Foundation
+#
+# See the NOTICE file(s) distributed with this work for additional
+# information regarding copyright ownership.
+#
+# This program and the accompanying materials are made available under the
+# terms of the Apache License Version 2.0 which is available at
+# https://www.apache.org/licenses/LICENSE-2.0
+#
+# SPDX-License-Identifier: Apache-2.0
+# *******************************************************************************
+module(
+    name = "score_tck",
+    version = "0.1.0",
+)
+
+# Use the S-CORE Bazel registry for toolchains and dependencies
+# This pulls rules_rust, crates, and toolchains from the eclipse-score ecosystem.
+
+bazel_dep(name = "platforms", version = "1.0.0")
+bazel_dep(name = "rules_rust", version = "0.68.1-score")
+
+# S-CORE crate universe (provides anyhow, clap, serde, serde_json, tempfile)
+bazel_dep(name = "score_crates")
+git_override(
+    module_name = "score_crates",
+    commit = "4656dda8f04a3d88c8089f63111195840cfbd9e3",
+    remote = "https://github.com/eclipse-score/score-crates.git",
+)

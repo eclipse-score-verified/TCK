@@ -1,0 +1,106 @@
+# *******************************************************************************
+# Copyright (c) 2026 Contributors to the Eclipse Foundation
+#
+# See the NOTICE file(s) distributed with this work for additional
+# information regarding copyright ownership.
+#
+# This program and the accompanying materials are made available under the
+# terms of the Apache License Version 2.0 which is available at
+# https://www.apache.org/licenses/LICENSE-2.0
+#
+# SPDX-License-Identifier: Apache-2.0
+# *******************************************************************************
+name: Build TCK Binary
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'runner/**'
+      - 'reference/**'
+      - 'tests/**'
+      - 'BUILD'
+      - 'MODULE.bazel'
+      - '.bazelrc'
+  push:
+    branches:
+      - main
+    paths:
+      - 'runner/**'
+      - 'reference/**'
+      - 'tests/**'
+      - 'BUILD'
+      - 'MODULE.bazel'
+      - '.bazelrc'
+  release:
+    types: [created]
+permissions:
+  contents: read
+jobs:
+  build:
+    name: Build score-tck binary
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Setup Bazel
+        uses: bazel-contrib/setup-bazel@0.18.0
+        with:
+          bazelisk-cache: true
+          disk-cache: tck-build
+          repository-cache: true
+          cache-save: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
+      - name: Build TCK binary
+        run: |
+          bazel build //:score-tck
+          cp bazel-bin/score-tck /tmp/score-tck-bin
+          chmod +x /tmp/score-tck-bin
+      - name: Run TCK unit tests
+        run: |
+          bazel test //:score-tck-tests
+      - name: Smoke test TCK binary
+        run: |
+          /tmp/score-tck-bin version
+      - name: Bundle TCK package
+        run: |
+          VERSION="${{ github.event.release.tag_name || '0.1.0' }}"
+          mkdir -p score-tck-bundle/bin
+          mkdir -p score-tck-bundle/reference/policy
+          mkdir -p score-tck-bundle/tests
+          mkdir -p score-tck-bundle/docs
+
+          cp /tmp/score-tck-bin score-tck-bundle/bin/score-tck
+          cp reference/sbom.spdx.json score-tck-bundle/reference/
+          cp reference/policy/requirements.toml score-tck-bundle/reference/policy/
+          cp tests/behavioral.toml score-tck-bundle/tests/
+          cp tests/api_signatures.toml score-tck-bundle/tests/
+          cp tck.config.example.toml score-tck-bundle/
+          cp README.md score-tck-bundle/
+
+          tar -czvf score-tck-${VERSION}-linux-x86_64.tar.gz score-tck-bundle/
+          echo "Created bundle: score-tck-${VERSION}-linux-x86_64.tar.gz"
+          ls -la score-tck-*.tar.gz
+      - name: Upload TCK bundle artifact
+        uses: actions/upload-artifact@604373da6381bf24206979c74d06a550515601b9 # v4.4.1
+        with:
+          name: score-tck-bundle-linux-x86_64
+          path: score-tck-*.tar.gz
+          retention-days: 30
+  release:
+    if: github.event_name == 'release'
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Download TCK bundle artifact
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: score-tck-bundle-linux-x86_64
+      - name: Attach bundle to release
+        uses: softprops/action-gh-release@v2.5.0
+        with:
+          files: score-tck-*.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
