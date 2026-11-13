@@ -1,0 +1,9 @@
+load("@rules_python//python:py_library.bzl", "py_library")
+
+# Sources only. The tool hashes every *.py in this directory to identify itself, so no
+# target that generates files (py_binary writes a bootstrap script) may live here.
+py_library(
+    name = "lib",
+    srcs = glob(["*.py"]),
+    visibility = ["//visibility:public"],
+)

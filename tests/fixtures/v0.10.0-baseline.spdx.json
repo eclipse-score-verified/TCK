@@ -1,0 +1,23 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "TEST FIXTURE - not the official S-CORE v0.10.0 SBOM. Commits resolved by hand from the module release tags.",
+  "documentNamespace": "https://eclipse.dev/score/spdx/tck-fixture-v0.10.0",
+  "creationInfo": {"created": "2026-11-11T00:00:00Z", "creators": ["Tool: score-tck-fixture"]},
+  "packages": [
+    {"SPDXID": "SPDXRef-score-baselibs", "name": "score_baselibs", "versionInfo": "0.2.17", "filesAnalyzed": false,
+     "downloadLocation": "git+https://github.com/eclipse-score/baselibs.git@41f5a4c92163dc1f597116094ed34881ddee7fa3"},
+    {"SPDXID": "SPDXRef-score-communication", "name": "score_communication", "versionInfo": "0.6.0", "filesAnalyzed": false,
+     "downloadLocation": "git+https://github.com/eclipse-score/communication.git@c5efd74f64c42ea3c60e19a1a3d5456a47ed1115"},
+    {"SPDXID": "SPDXRef-score-logging", "name": "score_logging", "versionInfo": "0.2.6", "filesAnalyzed": false,
+     "downloadLocation": "git+https://github.com/eclipse-score/logging.git@72ef907bb48e4b007b34f145f1383ea1469bcd6d"},
+    {"SPDXID": "SPDXRef-score-lifecycle", "name": "score_lifecycle", "versionInfo": "0.10.0", "filesAnalyzed": false,
+     "downloadLocation": "git+https://github.com/eclipse-score/lifecycle.git@2afae116992d11dd15d8eac5a271790ee1234e37"},
+    {"SPDXID": "SPDXRef-score-persistency", "name": "score_persistency", "versionInfo": "0.4.0", "filesAnalyzed": false,
+     "downloadLocation": "git+https://github.com/eclipse-score/persistency.git@0fe1dc7c8dff24dd78b7368f247f7ba3421c5944"},
+    {"SPDXID": "SPDXRef-score-time", "name": "score_time", "versionInfo": "0.3.1", "filesAnalyzed": false,
+     "downloadLocation": "git+https://github.com/eclipse-score/time.git@94efbf738ed6529f2cd859f827c26fd6723951c0"}
+  ],
+  "relationships": []
+}
