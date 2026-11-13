@@ -1,0 +1,16 @@
+load("@rules_python//python:py_binary.bzl", "py_binary")
+
+# bazel run //:cli -- {sbom,test,bundle,verify} ...
+py_binary(
+    name = "cli",
+    main_module = "tck",
+    visibility = ["//visibility:public"],
+    deps = ["//tck:lib"],
+)
+
+# Release baselines, for the tests and for modules that depend on @score_tck.
+filegroup(
+    name = "baselines",
+    srcs = glob(["baselines/*.json"]),
+    visibility = ["//visibility:public"],
+)

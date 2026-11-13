@@ -1,0 +1,10 @@
+load("@rules_python//python:py_test.bzl", "py_test")
+
+# Needs git and ssh-keygen (OpenSSH 8.1+) on the host.
+py_test(
+    name = "test_tck",
+    size = "small",
+    srcs = ["test_tck.py"],
+    data = ["//:baselines"] + glob(["fixtures/*"]),
+    deps = ["//tck:lib"],
+)

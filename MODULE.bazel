@@ -1,0 +1,6 @@
+module(name = "score_tck", version = "0.1.0")
+
+bazel_dep(name = "rules_python", version = "1.8.3")
+
+python = use_extension("@rules_python//python/extensions:python.bzl", "python")
+python.toolchain(python_version = "3.12")

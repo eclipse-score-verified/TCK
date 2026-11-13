@@ -1,6 +1,7 @@
 """S-CORE Verified TCK command line: python3 -m tck {sbom,test,bundle,verify}."""
 
 import argparse
+import os
 import sys
 
 from . import bundle, load_baseline, runner, sbom
@@ -27,6 +28,8 @@ def main(argv=None):
     p.add_argument("--allowed-signers", required=True, help="ssh allowed_signers file of registered vendors")
     p.add_argument("--identity", required=True, help="vendor identity in the allowed_signers file")
     args = parser.parse_args(argv)
+    # under 'bazel run' the process starts in the runfiles tree; paths are relative to the caller
+    os.chdir(os.environ.get("BUILD_WORKING_DIRECTORY", "."))
 
     baseline = load_baseline(args.baseline, args.baseline_sbom)
     paths = dict(m.split("=", 1) for m in getattr(args, "module", []))

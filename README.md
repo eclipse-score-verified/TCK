@@ -25,7 +25,18 @@ Process, commands and the report format: [docs/process.md](docs/process.md).
 Diagram: [docs/process.drawio](docs/process.drawio).
 
 Requires Python 3.9+, git and OpenSSH 8.1+ (`ssh-keygen -Y`); no other dependencies.
-Tests: `python3 -m unittest discover tests`.
+
+## Bazel
+
+| | Bazel | Plain Python |
+|---|---|---|
+| Build | `bazel build //...` | - |
+| Test | `bazel test //...` | `python3 -m unittest discover tests` |
+| Run | `bazel run //:cli -- sbom ...` | `python3 -m tck sbom ...` |
+
+Both forms are the same tool and accept each other's bundles. Under `bazel run`,
+paths are relative to the directory the command is called from. Another Bazel
+module can use `@score_tck//:cli` and `@score_tck//:baselines`.
 
 ## Status
 

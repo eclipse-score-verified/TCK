@@ -59,6 +59,8 @@ python3 -m tck bundle --baseline baselines/v0.10.0.json --baseline-sbom score-v0
     --key ~/.ssh/id_ed25519
 ```
 
+With Bazel, `bazel run //:cli --` replaces `python3 -m tck` in every command here.
+
 `score-v0.10.0.spdx.json` is the product SBOM of the S-CORE release. `tck sbom
 --product-sbom <file>` annotates an existing full SBOM instead of writing one
 that lists the S-CORE modules only.
