@@ -6,7 +6,7 @@ S-CORE v0.10.0". Diagram: [process.drawio](process.drawio).
 ## Who does what
 
 | Party | Does | Sees vendor source |
-|---|---|---|
+| --- | --- | --- |
 | S-CORE upstream | Publishes the `reference_integration` release and its product SBOM | no |
 | TCK (this repo) | Pins the release in `baselines/vX.Y.json`, ships the `tck` tool | no |
 | Vendor | Runs `tck sbom`, `tck test`, `tck bundle` on their stack, sends the bundle | yes |
@@ -47,19 +47,17 @@ Needed: the module git repositories (with upstream history), a
 to the public upstream repositories (the tool fetches upstream `main` to compare).
 
 ```sh
-python3 -m tck sbom --baseline baselines/v0.10.0.json --baseline-sbom score-v0.10.0.spdx.json \
+bazel run //:cli -- sbom --baseline baselines/v0.10.0.json --baseline-sbom score-v0.10.0.spdx.json \
     --module score_baselibs=../baselibs --module score_communication=../communication \
     --module score_logging=../logging --module score_lifecycle=../lifecycle \
     --module score_persistency=../persistency --module score_time=../time
 
-python3 -m tck test --baseline baselines/v0.10.0.json --baseline-sbom score-v0.10.0.spdx.json \
+bazel run //:cli -- test --baseline baselines/v0.10.0.json --baseline-sbom score-v0.10.0.spdx.json \
     --ref-int ../reference_integration   # plus the same --module options
 
-python3 -m tck bundle --baseline baselines/v0.10.0.json --baseline-sbom score-v0.10.0.spdx.json \
+bazel run //:cli -- bundle --baseline baselines/v0.10.0.json --baseline-sbom score-v0.10.0.spdx.json \
     --key ~/.ssh/id_ed25519
 ```
-
-With Bazel, `bazel run //:cli --` replaces `python3 -m tck` in every command here.
 
 `score-v0.10.0.spdx.json` is the product SBOM of the S-CORE release. `tck sbom
 --product-sbom <file>` annotates an existing full SBOM instead of writing one
@@ -68,7 +66,7 @@ that lists the S-CORE modules only.
 Send the `tck-out/` directory. It contains:
 
 | File | Content |
-|---|---|
+| --- | --- |
 | `sbom.spdx.json` | SPDX 2.3. Each S-CORE module package has `versionInfo` = release version and `externalRefs` `score-tck-base-commit`, `score-tck-head-commit`, `score-tck-commits-ahead` |
 | `junit/` | Bazel `test.xml` files of the platform integration tests |
 | `tests.json` | `reference_integration` commit, tested module commits, Bazel exit code |
@@ -83,7 +81,7 @@ The vendor's public key is registered in an OpenSSH `allowed_signers` file
 (`<identity> <public key>`).
 
 ```sh
-python3 -m tck verify --baseline baselines/v0.10.0.json --baseline-sbom score-v0.10.0.spdx.json \
+bazel run //:cli -- verify --baseline baselines/v0.10.0.json --baseline-sbom score-v0.10.0.spdx.json \
     --out <bundle dir> --allowed-signers allowed_signers --identity vendor@example.com
 ```
 

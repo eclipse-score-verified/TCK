@@ -15,28 +15,28 @@ Two checks, both bound to one `reference_integration` release:
 2. **Tests** - the release's platform integration tests pass on those modules.
 
 ```
-python3 -m tck sbom   ...   # vendor: check module ancestry, write the SBOM
-python3 -m tck test   ...   # vendor: run the platform integration tests
-python3 -m tck bundle ...   # vendor: write and sign the report bundle
-python3 -m tck verify ...   # S-CORE Verified: check a received bundle
+bazel run //:cli -- sbom   ...   # vendor: check module ancestry, write the SBOM
+bazel run //:cli -- test   ...   # vendor: run the platform integration tests
+bazel run //:cli -- bundle ...   # vendor: write and sign the report bundle
+bazel run //:cli -- verify ...   # S-CORE Verified: check a received bundle
 ```
 
 Process, commands and the report format: [docs/process.md](docs/process.md).
 Diagram: [docs/process.drawio](docs/process.drawio).
 
-Requires Python 3.9+, git and OpenSSH 8.1+ (`ssh-keygen -Y`); no other dependencies.
+Requires Bazel, git and OpenSSH 8.1+ (`ssh-keygen -Y`). Bazel provides the Python
+toolchain. Run the tool only through Bazel, not with `python3 -m tck`.
 
 ## Bazel
 
-| | Bazel | Plain Python |
-|---|---|---|
-| Build | `bazel build //...` | - |
-| Test | `bazel test //...` | `python3 -m unittest discover tests` |
-| Run | `bazel run //:cli -- sbom ...` | `python3 -m tck sbom ...` |
+| | Command |
+|---|---|
+| Build | `bazel build //...` |
+| Test | `bazel test //...` |
+| Run | `bazel run //:cli -- sbom ...` |
 
-Both forms are the same tool and accept each other's bundles. Under `bazel run`,
-paths are relative to the directory the command is called from. Another Bazel
-module can use `@score_tck//:cli` and `@score_tck//:baselines`.
+Under `bazel run`, paths are relative to the directory the command is called
+from. Another Bazel module can use `@score_tck//:cli` and `@score_tck//:baselines`.
 
 ## Status
 

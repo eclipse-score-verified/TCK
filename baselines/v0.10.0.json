@@ -14,8 +14,7 @@
     "score_communication",
     "score_logging",
     "score_lifecycle",
-    "score_persistency",
-    "score_time"
+    "score_persistency"
   ],
   "tests": {
     "bazel_args": ["--config=linux-x86_64"],
