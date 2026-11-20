@@ -1,0 +1,34 @@
+{
+  "score_release": "v0.10.0",
+  "reference_integration": {
+    "repo": "https://github.com/eclipse-score/reference_integration.git",
+    "commit": "ca2a5f03724780be3cebf3d80e0c9c0c6fa64eb2"
+  },
+  "sbom": {
+    "comment": "Not pinned: v0.10.0 ships no product SBOM with module commits as a release asset. Set url and sha256 once upstream publishes it.",
+    "url": null,
+    "sha256": null
+  },
+  "mandatory": [
+    "score_baselibs",
+    "score_communication",
+    "score_logging",
+    "score_lifecycle",
+    "score_persistency"
+  ],
+  "tests": {
+    "bazel_args": ["--config=linux-x86_64"],
+    "targets": ["//platform_integration_tests:pit"],
+    "modules": {
+      "score_communication": "platform_integration_tests/communication",
+      "score_lifecycle": "platform_integration_tests/lifecycle",
+      "score_logging": "platform_integration_tests/logging",
+      "score_time": "platform_integration_tests/time",
+      "score_kyron": "platform_integration_tests/kyron"
+    }
+  },
+  "gaps": {
+    "score_baselibs": "no platform integration test in v0.10.0",
+    "score_persistency": "no platform integration test in v0.10.0"
+  }
+}
