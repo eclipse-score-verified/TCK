@@ -171,6 +171,22 @@ class TckTest(unittest.TestCase):
         self.assertEqual(self.make_bundle(JUNIT_FAIL)["verdict"], "NON-CONFORMANT")
         self.assertTrue(self.verify())
 
+    def summary_row(self, name):
+        return next(l for l in (self.out / "summary.md").read_text().splitlines() if l.startswith(f"| {name} "))
+
+    def test_summary_separates_test_failure_from_sbom(self):
+        self.make_bundle(JUNIT_FAIL)
+        self.assertEqual(self.summary_row("score_a"), "| score_a | yes | 1.0.0 | 0 | pass | fail: 0/1 passed |")
+
+    def test_summary_lists_missing_module_and_no_commit_count_without_base(self):
+        git(self.vendor["score_a"], "checkout", "-q", self.commits["score_a"]["older"])
+        sbom.generate(self.baseline, {"score_a": self.vendor["score_a"]}, self.out)
+        self.fake_bazel()
+        runner.run(self.baseline, self.ref_int, {"score_a": self.vendor["score_a"]}, self.out)
+        bundle.bundle(self.out, self.baseline, self.key)
+        self.assertEqual(self.summary_row("score_a"), "| score_a | yes | NOASSERTION | n/a | fail | 1/1 passed |")
+        self.assertEqual(self.summary_row("score_b"), "| score_b | yes | - | n/a | fail: missing | not run |")
+
     def test_results_of_an_earlier_run_are_not_collected_when_the_build_fails(self):
         self.make_bundle()
         (self.tmp / "bin" / "bazel").write_text("#!/bin/sh\nexit 1\n")

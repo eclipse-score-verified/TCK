@@ -30,9 +30,11 @@ with Bazel from an unmodified `reference_integration` checkout at the release
 commit, with the vendor modules passed as `--override_module`. A mandatory module
 with no platform test in that release is reported as a gap, not as passed.
 
-The release tags alone do not build these tests: `reference_integration` applies
-its own patches (`patches/<module>/`) to every module. A vendor module must carry
-them as commits on top of the release commit.
+**Patches are not checked.** `reference_integration` applies its own patches
+(`patches/<module>/`) to the modules. The TCK does not check whether a vendor
+module carries them. The release tags alone do not build the platform tests, so a
+vendor can add the patches as commits on top of the release commit; like other
+own commits, they are allowed.
 
 Every step writes its evidence also when it fails, so a failed run still ends in
 a signed NON-CONFORMANT report.

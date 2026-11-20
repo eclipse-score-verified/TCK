@@ -40,6 +40,8 @@ def evaluate(out_dir, baseline):
         if not facts:
             if mandatory:
                 errors.append(f"{name}: mandatory module missing from the SBOM")
+                modules[name] = {"mandatory": True, "version": None, "commits_ahead": "n/a",
+                                 "sbom": "fail: missing", "test": "not run", "status": "fail"}
             continue
         entry = {"mandatory": mandatory, "version": packages[name].get("versionInfo"), **facts}
         problems = []
@@ -48,10 +50,12 @@ def evaluate(out_dir, baseline):
                 f"not based on the release commit {ref['commit'][:12]} "
                 f"(common ancestor with upstream: {facts.get('base_commit')})"
             )
+            entry["commits_ahead"] = "n/a"  # counted from the release commit, which is not a base here
         if str(facts.get("head_commit")).endswith("-dirty"):
             problems.append("working tree was not clean")
         if tests["modules"].get(name) != facts.get("head_commit"):
             problems.append("tested commit differs from the SBOM")
+        entry["sbom"] = "fail" if problems else "pass"
         prefix = baseline["tests"]["modules"].get(name)
         if name in baseline["gaps"]:
             entry["test"] = "gap: " + baseline["gaps"][name]
@@ -59,6 +63,7 @@ def evaluate(out_dir, baseline):
             total, failed = _junit(out / "junit", prefix)
             entry["test"] = f"{total - failed}/{total} passed"
             if total == 0 or failed:
+                entry["test"] = "fail: " + entry["test"]
                 problems.append("platform integration tests failed or did not run")
         else:
             entry["test"] = "none defined"
@@ -67,6 +72,7 @@ def evaluate(out_dir, baseline):
             errors += [f"{name}: {p}" for p in problems]
         elif problems:
             entry["status"] = "not verified: " + "; ".join(problems)
+            entry["sbom"] = "not verified" if entry["sbom"] == "fail" else entry["sbom"]
         modules[name] = entry
 
     return {
@@ -92,8 +98,8 @@ def _summary(report):
     ]
     for name, m in report["modules"].items():
         lines.append(
-            f"| {name} | {'yes' if m['mandatory'] else 'no'} | {m['version']} | "
-            f"{m.get('commits_ahead', '?')} | {m['status']} | {m['test']} |"
+            f"| {name} | {'yes' if m['mandatory'] else 'no'} | {m['version'] or '-'} | "
+            f"{m.get('commits_ahead', '?')} | {m['sbom']} | {m['test']} |"
         )
     lines += ["", *[f"- {e}" for e in report["errors"]]]
     return "\n".join(lines) + "\n"
